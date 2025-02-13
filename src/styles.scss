@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+@import 'assets/scss/variables';
+
+/* fonts-icon */
+@import 'assets/scss/fonts/fontawesome/scss/fontawesome';
+@import 'assets/scss/fonts/feather/iconfont';
+
+@import 'assets/scss/general';
+@import 'assets/scss/generic';
+@import 'assets/scss/mixins/function';
+
+/* important element */
+@import 'assets/scss/menu/menu-lite';
+
+/* basic elements */
+@import 'assets/scss/theme-elements/theme-elements';
+
+/* third party modules style*/
+@import 'assets/scss/plugins/plugins';
+
+@import 'assets/scss/custom';
+
+strong {
+  font-weight: bold;
+}

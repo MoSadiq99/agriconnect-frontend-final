@@ -1,0 +1,118 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card cardTitle="Basic Component" [options]="false">
+      <div class="card-header d-flex justify-content-center align-items-center text-center bg-primary text-white">
+        <h4 class="py-3 mb-0 text-center">Add New Cultivation</h4>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="onSubmit(cultivationForm)" #cultivationForm="ngForm" class="needs-validation" novalidate>
+          <!-- Crop Type -->
+          <div class="mb-3">
+            <label for="cropType" class="form-label">Crop Type</label>
+            <input type="text" id="cropType" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.cropType" name="cropType" required (input)="onCropTypeInput()"
+              [ngClass]="{'is-invalid': cultivationForm.controls['cropType']?.invalid && cultivationForm.controls['cropType']?.touched}" />
+            <div class="invalid-feedback">
+              Please enter a crop type.
+            </div>
+            <ul *ngIf="filteredCropTypes.length > 0" class="list-group mt-2">
+              <li *ngFor="let suggestion of filteredCropTypes" class="list-group-item list-group-item-action"
+                (click)="selectSuggestion(suggestion)">{{ suggestion }}</li>
+            </ul>
+          </div>
+
+          <!-- Cultivation Date -->
+          <div class="mb-3">
+            <label for="cultivationDate" class="form-label">Cultivation Date</label>
+            <input type="date" id="cultivationDate" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.cultivationDate" name="cultivationDate" required
+              [ngClass]="{'is-invalid': cultivationForm.controls['cultivationDate']?.invalid && cultivationForm.controls['cultivationDate']?.touched}" />
+            <div class="invalid-feedback">
+              Please select a cultivation date.
+            </div>
+          </div>
+
+          <!-- Harvest Date -->
+          <div class="mb-3">
+            <label for="harvestDate" class="form-label">Harvest Date</label>
+            <input type="date" id="harvestDate" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.harvestDate" name="harvestDate" required
+              [ngClass]="{'is-invalid': cultivationForm.controls['harvestDate']?.invalid && cultivationForm.controls['harvestDate']?.touched}" />
+            <div class="invalid-feedback">
+              Please select a harvest date.
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" id="location" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.location" name="location" required
+              [ngClass]="{'is-invalid': cultivationForm.controls['location']?.invalid && cultivationForm.controls['location']?.touched}" />
+            <div class="invalid-feedback">
+              Please enter a location.
+            </div>
+          </div>
+
+          <!-- Land Size -->
+          <div class="mb-3">
+            <label for="landSize" class="form-label">Land Size (in acres)</label>
+            <input type="number" id="landSize" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.landSize" name="landSize" required min="1"
+              [ngClass]="{'is-invalid': cultivationForm.controls['landSize']?.invalid && cultivationForm.controls['landSize']?.touched}" />
+            <div class="invalid-feedback">
+              Please enter a valid land size.
+            </div>
+          </div>
+
+          <!-- Expected Yield -->
+          <div class="mb-3">
+            <label for="expectedYield" class="form-label">Expected Yield (in kg)</label>
+            <input type="number" id="expectedYield" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.expectedYield" name="expectedYield" required min="1"
+              [ngClass]="{'is-invalid': cultivationForm.controls['expectedYield']?.invalid && cultivationForm.controls['expectedYield']?.touched}" />
+            <div class="invalid-feedback">
+              Please enter a valid expected yield.
+            </div>
+          </div>
+
+          <!-- Method of Cultivation -->
+          <div class="mb-3">
+            <label for="methodOfCultivation" class="form-label">Method of Cultivation</label>
+            <select id="methodOfCultivation" class="form-select form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.methodOfCultivation" name="methodOfCultivation" required
+              [ngClass]="{'is-invalid': cultivationForm.controls['methodOfCultivation']?.invalid && cultivationForm.controls['methodOfCultivation']?.touched}">
+              <option value="" disabled>Select Method</option>
+              <option *ngFor="let method of methods" [value]="method">{{ method }}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a method of cultivation.
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control form-control-lg rounded-pill"
+              [(ngModel)]="cultivation.description" name="description" rows="3" required
+              [ngClass]="{'is-invalid': cultivationForm.controls['description']?.invalid && cultivationForm.controls['description']?.touched}"></textarea>
+            <div class="invalid-feedback">
+              Please provide a description.
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-between gap-2">
+            <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill" (click)="close()">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill"
+              [disabled]="!cultivationForm.form.valid">
+              <i class="bi bi-check-circle"></i> Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </app-card>
+  </div>
+</div>

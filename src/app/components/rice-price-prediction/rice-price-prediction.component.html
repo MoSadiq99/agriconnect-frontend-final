@@ -1,0 +1,55 @@
+<!-- rice-price-prediction.component.html -->
+<div class="prediction-modal">
+  <div class="modal-header">
+    <h4>Rice Price Prediction</h4>
+    <!-- <button class="close-btn" (click)="close()">&times;</button> -->
+  </div>
+
+  <form (ngSubmit)="predictPrice()" class="prediction-form">
+    <div class="form-group">
+      <label>Year:</label>
+      <input type="number" [(ngModel)]="year" name="year" required
+             [min]="currentYear - 5" [max]="currentYear + 5"
+             class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label>Month:</label>
+      <select [(ngModel)]="month" name="month" required class="form-control">
+        <option *ngFor="let m of months" [value]="m.value">{{ m.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Exchange Rate (USD to LKR):</label>
+      <input type="number" [(ngModel)]="exchangeRate" name="exchangeRate"
+             required step="0.01" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label>Fuel Price (LKR):</label>
+      <input type="number" [(ngModel)]="fuelPrice" name="fuelPrice"
+             required step="0.01" class="form-control">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary px-5">Predict</button>
+      <button type="button" class="btn btn-danger" (click)="close()">Close</button>
+    </div>
+  </form>
+
+  <div *ngIf="predictionResults" class="prediction-results mt-4">
+    <h5>Prediction Results</h5>
+    <div class="result-item mt-3">
+      <span>Retail Price: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <strong>{{ predictionResults.retailPrice | number:'1.2-2' }} LKR</strong>
+    </div>
+    <div class="result-item">
+      <span>Producer Price: &nbsp;&nbsp;&nbsp;</span>
+      <strong>{{ predictionResults.producerPrice | number:'1.2-2' }} LKR</strong>
+    </div>
+    <button class="btn btn-success mt-3" (click)="savePrediction()">
+      Save Prediction
+    </button>
+  </div>
+</div>

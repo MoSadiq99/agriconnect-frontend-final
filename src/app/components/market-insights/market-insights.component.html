@@ -1,0 +1,62 @@
+<!-- market-insights.component.html -->
+<div class="market-insights-container">
+  <h2>Market Insights</h2>
+
+  <h3 class="mt-3">Rice Market Insights</h3>
+
+  <!-- Prediction Section -->
+  <div class="prediction-controls mt-3">
+    <button class="btn btn-primary" (click)="openPredictionModal()">Predict Rice Price</button>
+    <button class="btn btn-secondary" (click)="toggleSavedPredictions()">
+      {{ showSavedPredictions ? 'Hide' : 'View' }} Saved Predictions
+    </button>
+  </div>
+
+  <!-- Saved Predictions Table -->
+  <div *ngIf="showSavedPredictions" class="saved-predictions mt-3">
+    <h3>Saved Predictions</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Retail Price</th>
+          <th>Producer Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prediction of savedPredictions">
+          <td>{{ prediction.month }}/{{ prediction.year }}</td>
+          <td>{{ prediction.retailPrice | number:'1.2-2' }} LKR</td>
+          <td>{{ prediction.producerPrice | number:'1.2-2' }} LKR</td>
+          <td>
+            <button class="btn btn-sm btn-danger" (click)="deletePrediction(prediction)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Historical Data Charts -->
+  <div class="charts row mt-5">
+    <div class="chart-container col-md-6">
+      <h3>Retail Price History</h3>
+      <canvas id="retailPriceChart"></canvas>
+    </div>
+    <div class="chart-container col-md-6">
+      <h3>Producer Price History</h3>
+      <canvas id="producerPriceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Prediction Modal -->
+  <div *ngIf="isModalOpen" class="modal-overlay" (click)="closePredictionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-rice-price-prediction
+        [savedPredictions]="savedPredictions"
+        (closeModal)="closePredictionModal()"
+        (savePredictionEvent)="handleSavePrediction($event)">
+      </app-rice-price-prediction>
+    </div>
+  </div>
+</div>

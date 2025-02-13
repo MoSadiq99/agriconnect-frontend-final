@@ -1,0 +1,726 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Agriconnect API",
+    "description": "API documentation for Agriconnect",
+    "contact": {
+      "name": "Sadiq",
+      "email": "mail2sdq99@gmail.com"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Server"
+    },
+    {
+      "url": "https://agriconnect.onrender.com",
+      "description": "Production Server"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Authentication endpoints"
+    }
+  ],
+  "paths": {
+    "/api/predict": {
+      "post": {
+        "tags": [
+          "rice-price-prediction-controller"
+        ],
+        "operationId": "predictRicePrice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/farmer/listings": {
+      "post": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "addFarmerListing",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmerListing"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerListing"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/buyer/requests": {
+      "post": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "addBuyerRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuyerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuyerRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/certifications/expire": {
+      "post": {
+        "tags": [
+          "certification-controller"
+        ],
+        "operationId": "expireCertifications",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/certifications/certify/{farmerId}": {
+      "post": {
+        "tags": [
+          "certification-controller"
+        ],
+        "operationId": "certifyFarmer",
+        "parameters": [
+          {
+            "name": "farmerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "certificationType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remarks",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Certification"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/marketplace/match/{cropType}": {
+      "get": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "findMatches",
+        "parameters": [
+          {
+            "name": "cropType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FarmerListing"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/certifications/{farmerId}": {
+      "get": {
+        "tags": [
+          "certification-controller"
+        ],
+        "operationId": "getFarmerCertifications",
+        "parameters": [
+          {
+            "name": "farmerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Certification"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Farmer": {
+        "required": [
+          "address",
+          "name",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "pattern": "\\d{10}",
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FarmerCultivation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "farmer": {
+            "$ref": "#/components/schemas/Farmer"
+          },
+          "cropType": {
+            "type": "string"
+          },
+          "cultivationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "harvestDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "location": {
+            "type": "string"
+          },
+          "landSize": {
+            "type": "string"
+          },
+          "expectedYield": {
+            "type": "string"
+          },
+          "methodOfCultivation": {
+            "type": "string",
+            "enum": [
+              "ORGANIC",
+              "CONVENTIONAL"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "FarmerListing": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "farmer": {
+            "$ref": "#/components/schemas/User"
+          },
+          "cultivation": {
+            "$ref": "#/components/schemas/FarmerCultivation"
+          },
+          "cropType": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "location": {
+            "type": "string"
+          },
+          "availableDateFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "AVAILABLE",
+              "SOLD",
+              "PENDING"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "roleName": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "address",
+          "name",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "pattern": "\\d{10}",
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BuyerRequest": {
+        "required": [
+          "cropType",
+          "deadline",
+          "location",
+          "quantity",
+          "quantityType",
+          "requestType",
+          "startDate",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "buyer": {
+            "$ref": "#/components/schemas/User"
+          },
+          "cropType": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantityType": {
+            "type": "string",
+            "enum": [
+              "PCS",
+              "KG",
+              "LITRES"
+            ]
+          },
+          "location": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "requestType": {
+            "type": "string",
+            "enum": [
+              "DAILY_AVERAGE",
+              "ONE_TIME",
+              "WEEKLY_AVERAGE",
+              "MONTHLY_AVERAGE",
+              "URGENT"
+            ]
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Certification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "farmer": {
+            "$ref": "#/components/schemas/Farmer"
+          },
+          "certificationType": {
+            "type": "string",
+            "enum": [
+              "ORGANIC",
+              "SUSTAINABLE",
+              "QUALITY_GUARANTEED"
+            ]
+          },
+          "certificationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "EXPIRED",
+              "PENDING"
+            ]
+          },
+          "remarks": {
+            "type": "string"
+          }
+        }
+      },
+      "UserRegisterDto": {
+        "required": [
+          "address",
+          "email",
+          "name",
+          "password",
+          "phone",
+          "roles",
+          "userType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "pattern": "\\d{10}",
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "userType": {
+            "type": "string"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "description": "JWT auth description",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

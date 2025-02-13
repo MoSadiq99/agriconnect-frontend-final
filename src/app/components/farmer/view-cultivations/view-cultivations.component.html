@@ -1,0 +1,338 @@
+<div class="row">
+  <div class="col-sm-12">
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary-subtle text-dark h-100">
+          <div class="card-body">
+            <h5 class="card-title">Total Cultivations</h5>
+            <p class="card-text">{{ cultivations.length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-success-subtle text-dark h-100">
+          <div class="card-body">
+            <h5 class="card-title">Active Cultivations</h5>
+            <p class="card-text">{{ getActiveCultivations().length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-info-subtle text-dark h-100">
+          <div class="card-body">
+            <h5 class="card-title">Finished Cultivations</h5>
+            <p class="card-text">{{ getFinishedCultivations().length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card bg-warning-subtle text-dark h-100">
+          <div class="card-body">
+            <h5 class="card-title">Upcoming Cultivations</h5>
+            <p class="card-text">{{ getUpcomingCultivations().length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Sort Options -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="statusFilter" class="form-label">Filter by Crop Type</label>
+        <select id="statusFilter" class="form-select" [(ngModel)]="selectedCropType" (change)="filterCultivations()">
+          <option value="All">All</option>
+          <option *ngFor="let crop of cropTypes" [value]="crop">{{ crop }}</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="sortBy" class="form-label">Sort By</label>
+        <select id="sortBy" class="form-select" [(ngModel)]="sortBy" (change)="sortCultivations()">
+          <option value="cultivationDate">Cultivation Date</option>
+          <option value="harvestDate">Harvest Date</option>
+          <option value="expectedYield">Expected Yield</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Create New Cultivation Button -->
+    <div class="mb-3">
+      <button class="btn btn-outline-dark" (click)="openCreateCultivationModal(createCultivationModal)">
+        <i class="bi bi-plus-circle"></i> Create New Cultivation
+      </button>
+    </div>
+
+    <!-- Cultivations Cards -->
+    <div class="row">
+      <div *ngFor="let cultivation of filteredCultivations" class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">{{ cultivation.cropType }}</h5>
+              <span class="badge" [ngClass]="{
+                'bg-success': isActive(cultivation),
+                'bg-secondary': isFinished(cultivation),
+                'bg-warning': isUpcoming(cultivation)
+              }">
+                {{ isActive(cultivation) ? 'Active' : isFinished(cultivation) ? 'Finished' : 'Upcoming' }}
+              </span>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary me-2"
+                (click)="openUpdateModal(updateCultivationModal, cultivation)">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteCultivation(cultivation)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><strong>Cultivation Date:</strong> {{ cultivation.cultivationDate | date: 'mediumDate' }}</p>
+            <p><strong>Harvest Date:</strong> {{ cultivation.harvestDate | date: 'mediumDate' }}</p>
+            <p><strong>Expected Yield:</strong> {{ cultivation.expectedYield }} kg</p>
+            <p><strong>Location:</strong> {{ cultivation.location }}</p>
+            <p><strong>Land Size:</strong> {{ cultivation.landSize }} acres</p>
+            <p><strong>Method of Cultivation:</strong> {{ cultivation.methodOfCultivation }}</p>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-link" (click)="toggleCollapse(cultivation.id)">
+              {{ isCollapsed(cultivation.id) ? 'Show Description' : 'Hide Description' }}
+            </button>
+            <div *ngIf="!isCollapsed(cultivation.id)">
+              <!-- Additional details to show when expanded -->
+              <p><strong>Description:</strong> {{ cultivation.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Cultivation Modal -->
+<ng-template #createCultivationModal let-modal>
+  <div class="modal-header bg-">
+    <h4 class="modal-title ps-5">Add New Cultivation</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="createCultivation()" #cultivationForm="ngForm">
+      <div class="row">
+        <!-- Crop Type -->
+        <div class="col-md-6 mb-3">
+          <label for="cropType" class="form-label">Crop Type</label>
+          <input type="text" class="form-control" id="cropType" [(ngModel)]="newCultivation.cropType" name="cropType"
+            required
+            [ngClass]="{'is-invalid': cultivationForm.submitted && cultivationForm.controls['cropType'].errors}">
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['cropType'].errors" class="text-danger">
+            Crop Type is required.
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="col-md-6 mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" [(ngModel)]="newCultivation.location" name="location"
+            required>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['location'].errors" class="text-danger">
+            Location is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Cultivation Date -->
+        <div class="col-md-6 mb-3">
+          <label for="cultivationDate" class="form-label">Cultivation Date</label>
+          <input type="date" class="form-control" id="cultivationDate" [(ngModel)]="newCultivation.cultivationDate"
+            name="cultivationDate" required>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['cultivationDate'].errors"
+            class="text-danger">
+            Cultivation Date is required.
+          </div>
+        </div>
+
+        <!-- Harvest Date -->
+        <div class="col-md-6 mb-3">
+          <label for="harvestDate" class="form-label">Harvest Date</label>
+          <input type="date" class="form-control" id="harvestDate" [(ngModel)]="newCultivation.harvestDate"
+            name="harvestDate" required>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['harvestDate'].errors" class="text-danger">
+            Harvest Date is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Expected Yield -->
+        <div class="col-md-6 mb-3">
+          <label for="expectedYield" class="form-label">Expected Yield (kg)</label>
+          <input type="number" class="form-control" id="expectedYield" [(ngModel)]="newCultivation.expectedYield"
+            name="expectedYield" required>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['expectedYield'].errors"
+            class="text-danger">
+            Expected Yield is required.
+          </div>
+        </div>
+
+        <!-- Land Size -->
+        <div class="col-md-6 mb-3">
+          <label for="landSize" class="form-label">Land Size (acres)</label>
+          <input type="number" class="form-control" id="landSize" [(ngModel)]="newCultivation.landSize" name="landSize"
+            required>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['landSize'].errors" class="text-danger">
+            Land Size is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Method of Cultivation -->
+        <div class="col-md-6 mb-3">
+          <label for="methodOfCultivation" class="form-label">Method of Cultivation</label>
+          <select class="form-select" id="methodOfCultivation" [(ngModel)]="newCultivation.methodOfCultivation"
+            name="methodOfCultivation" required>
+            <option value="" disabled selected>Select Method</option>
+            <option value="Conventional">Conventional</option>
+            <option value="Organic">Organic</option>
+          </select>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['methodOfCultivation'].errors"
+            class="text-danger">
+            Method of Cultivation is required.
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-md-6 mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" [(ngModel)]="newCultivation.description" name="description"
+            required></textarea>
+          <div *ngIf="cultivationForm.submitted && cultivationForm.controls['description'].errors" class="text-danger">
+            Description is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-outline-dark px-5">Create</button>
+        <button type="button" class="btn btn-outline-danger" (click)="modal.dismiss()">Close</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Update Cultivation Modal -->
+<ng-template #updateCultivationModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Update Cultivation</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="updateCultivation()" #updateCultivationForm="ngForm">
+      <div class="row">
+        <!-- Crop Type -->
+        <div class="col-md-6 mb-3">
+          <label for="cropType" class="form-label">Crop Type</label>
+          <input type="text" class="form-control" id="cropType" [(ngModel)]="selectedCultivation.cropType"
+            name="cropType" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['cropType'].errors"
+            class="text-danger">
+            Crop Type is required.
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="col-md-6 mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" [(ngModel)]="selectedCultivation.location"
+            name="location" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['location'].errors"
+            class="text-danger">
+            Location is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Cultivation Date -->
+        <div class="col-md-6 mb-3">
+          <label for="cultivationDate" class="form-label">Cultivation Date</label>
+          <input type="date" class="form-control" id="cultivationDate" [(ngModel)]="selectedCultivation.cultivationDate"
+            name="cultivationDate" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['cultivationDate'].errors"
+            class="text-danger">
+            Cultivation Date is required.
+          </div>
+        </div>
+
+        <!-- Harvest Date -->
+        <div class="col-md-6 mb-3">
+          <label for="harvestDate" class="form-label">Harvest Date</label>
+          <input type="date" class="form-control" id="harvestDate" [(ngModel)]="selectedCultivation.harvestDate"
+            name="harvestDate" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['harvestDate'].errors"
+            class="text-danger">
+            Harvest Date is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Expected Yield -->
+        <div class="col-md-6 mb-3">
+          <label for="expectedYield" class="form-label">Expected Yield (kg)</label>
+          <input type="number" class="form-control" id="expectedYield" [(ngModel)]="selectedCultivation.expectedYield"
+            name="expectedYield" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['expectedYield'].errors"
+            class="text-danger">
+            Expected Yield is required.
+          </div>
+        </div>
+
+        <!-- Land Size -->
+        <div class="col-md-6 mb-3">
+          <label for="landSize" class="form-label">Land Size (acres)</label>
+          <input type="number" class="form-control" id="landSize" [(ngModel)]="selectedCultivation.landSize"
+            name="landSize" required>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['landSize'].errors"
+            class="text-danger">
+            Land Size is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Method of Cultivation -->
+        <div class="col-md-6 mb-3">
+          <label for="methodOfCultivation" class="form-label">Method of Cultivation</label>
+          <select class="form-select" id="methodOfCultivation" [(ngModel)]="selectedCultivation.methodOfCultivation"
+            name="methodOfCultivation" required>
+            <option value="" disabled selected>Select Method</option>
+            <option value="Conventional">Conventional</option>
+            <option value="Organic">Organic</option>
+          </select>
+          <div *ngIf="updateCultivationForm.submitted && updateCultivationForm.controls['methodOfCultivation'].errors"
+            class="text-danger">
+            Method of Cultivation is required.
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-md-6 mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" [(ngModel)]="selectedCultivation.description"
+            name="description"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

@@ -1,0 +1,32 @@
+/* marketplace.component.scss */
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.btn-group .btn {
+  margin-right: 10px;
+  &.active {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+}
+
+.chat-box {
+  max-height: 300px;
+  overflow-y: auto;
+  .message {
+    margin-bottom: 10px;
+    .message-sender {
+      text-align: right;
+      color: #007bff;
+    }
+    .message-receiver {
+      text-align: left;
+      color: #28a745;
+    }
+  }
+}

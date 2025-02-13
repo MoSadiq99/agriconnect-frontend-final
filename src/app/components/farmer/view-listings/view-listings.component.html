@@ -1,0 +1,196 @@
+<div class="row">
+  <div class="col-sm-12">
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <h5 class="card-title">Total Listings</h5>
+            <p class="card-text">{{ listings.length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <h5 class="card-title">Active Listings</h5>
+            <p class="card-text">{{ getActiveListings().length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-warning text-white">
+          <div class="card-body">
+            <h5 class="card-title">Pending Listings</h5>
+            <p class="card-text">{{ getPendingListings().length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Sort Options -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="statusFilter" class="form-label">Filter by Status</label>
+        <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatus" (change)="filterListings()">
+          <option value="All">All</option>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Sold">Sold</option>
+          <option value="Expired">Expired</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="sortBy" class="form-label">Sort By</label>
+        <select id="sortBy" class="form-select" [(ngModel)]="sortBy" (change)="sortListings()">
+          <option value="harvestDate">Harvest Date</option>
+          <option value="price">Price</option>
+          <option value="quantity">Quantity</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Create New Listing Button -->
+    <div class="mb-3">
+      <button class="btn btn-outline-dark" (click)="openCreateListingModal(createListingModal)">
+        <i class="bi bi-plus-circle"></i> Create New Listing
+      </button>
+    </div>
+
+    <!-- Listings Cards -->
+    <div class="row">
+      <div *ngFor="let listing of filteredListings" class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title">{{ listing.cropType }}</h5>
+              <span class="badge" [ngClass]="{
+                'bg-success': listing.status === 'Active',
+                'bg-warning': listing.status === 'Pending',
+                'bg-danger': listing.status === 'Expired',
+                'bg-secondary': listing.status === 'Sold'
+              }">
+                {{ listing.status }}
+              </span>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary me-2" (click)="openUpdateModal(updateListingModal, listing)">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteListing(listing)">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><strong>Quantity:</strong> {{ listing.quantity }} {{ listing.unit }}</p>
+            <p><strong>Price:</strong> {{ listing.price | currency }}</p>
+            <p><strong>Harvest Date:</strong> {{ listing.harvestDate | date: 'mediumDate' }}</p>
+            <p><strong>Location:</strong> {{ listing.location }}</p>
+            <p><strong>Description:</strong> {{ listing.description }}</p>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-link" (click)="toggleCollapse(listing.id)">
+              {{ isCollapsed(listing.id) ? 'Show More' : 'Show Less' }}
+            </button>
+            <div *ngIf="!isCollapsed(listing.id)">
+              <!-- Additional details to show when expanded -->
+              <p><strong>Farmer ID:</strong> {{ listing.farmerId }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Create Listing Modal -->
+<ng-template #createListingModal let-modal>
+  <div class="modal-header text-center w-100">
+    <h4 class="modal-title w-100">Create New Listing</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form #createForm="ngForm" (ngSubmit)="createListing()" class="row g-3">
+      <div class="col-md-6">
+        <label for="cropType" class="form-label">Crop Type</label>
+        <input type="text" class="form-control" id="cropType" [(ngModel)]="newListing.cropType" name="cropType" required #cropType="ngModel">
+        <div *ngIf="cropType.invalid && cropType.touched" class="text-danger">Crop Type is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="quantity" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="quantity" [(ngModel)]="newListing.quantity" name="quantity" required min="1" #quantity="ngModel">
+        <div *ngIf="quantity.invalid && quantity.touched" class="text-danger">Enter a valid quantity.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="price" class="form-label">Price</label>
+        <input type="number" class="form-control" id="price" [(ngModel)]="newListing.price" name="price" required min="1" #price="ngModel">
+        <div *ngIf="price.invalid && price.touched" class="text-danger">Enter a valid price.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="harvestDate" class="form-label">Harvest Date</label>
+        <input type="date" class="form-control" id="harvestDate" [(ngModel)]="newListing.harvestDate" name="harvestDate" required #harvestDate="ngModel">
+        <div *ngIf="harvestDate.invalid && harvestDate.touched" class="text-danger">Select a valid date.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" class="form-control" id="location" [(ngModel)]="newListing.location" name="location" required #location="ngModel">
+        <div *ngIf="location.invalid && location.touched" class="text-danger">Location is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" [(ngModel)]="newListing.description" name="description" required #description="ngModel"></textarea>
+        <div *ngIf="description.invalid && description.touched" class="text-danger">Description is required.</div>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary w-50" [disabled]="createForm.invalid">Create</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Update Listing Modal -->
+<ng-template #updateListingModal let-modal>
+  <div class="modal-header text-center w-100">
+    <h4 class="modal-title w-100">Update Listing</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form #updateForm="ngForm" (ngSubmit)="updateListing()" class="row g-3">
+      <div class="col-md-6">
+        <label for="cropType" class="form-label">Crop Type</label>
+        <input type="text" class="form-control" id="cropType" [(ngModel)]="selectedListing.cropType" name="cropType" required #cropTypeUpdate="ngModel">
+        <div *ngIf="cropTypeUpdate.invalid && cropTypeUpdate.touched" class="text-danger">Crop Type is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="quantity" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="quantity" [(ngModel)]="selectedListing.quantity" name="quantity" required min="1" #quantityUpdate="ngModel">
+        <div *ngIf="quantityUpdate.invalid && quantityUpdate.touched" class="text-danger">Enter a valid quantity.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="price" class="form-label">Price</label>
+        <input type="number" class="form-control" id="price" [(ngModel)]="selectedListing.price" name="price" required min="1" #priceUpdate="ngModel">
+        <div *ngIf="priceUpdate.invalid && priceUpdate.touched" class="text-danger">Enter a valid price.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="harvestDate" class="form-label">Harvest Date</label>
+        <input type="date" class="form-control" id="harvestDate" [(ngModel)]="selectedListing.harvestDate" name="harvestDate" required #harvestDateUpdate="ngModel">
+        <div *ngIf="harvestDateUpdate.invalid && harvestDateUpdate.touched" class="text-danger">Select a valid date.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" class="form-control" id="location" [(ngModel)]="selectedListing.location" name="location" required #locationUpdate="ngModel">
+        <div *ngIf="locationUpdate.invalid && locationUpdate.touched" class="text-danger">Location is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" [(ngModel)]="selectedListing.description" name="description" required #descriptionUpdate="ngModel"></textarea>
+        <div *ngIf="descriptionUpdate.invalid && descriptionUpdate.touched" class="text-danger">Description is required.</div>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary w-50" [disabled]="updateForm.invalid">Update</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

@@ -1,0 +1,43 @@
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-content {
+  width: 100%;
+  max-width: 500px;
+}
+
+.card {
+  padding: 20px;
+}
+
+.row {
+  margin-bottom: 15px;
+}
+
+.col-md-6 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.input-group {
+  width: 100%;
+}
+
+.btn {
+  width: 100%;
+}
+
+.form-control {
+  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.checkbox label {
+  font-size: 14px;
+}

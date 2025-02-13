@@ -1,0 +1,122 @@
+/* Ensure the card and table are responsive */
+.card-body {
+  padding: 1.5rem;
+}
+
+.table-responsive {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  max-height: 500px; /* Set a max height for vertical scrolling */
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+}
+
+/* Table styling */
+.table {
+  width: 100%;
+  margin-bottom: 0; /* Remove default margin */
+  color: #212529;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th, td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* Light gray background for header */
+    z-index: 1; /* Ensure header stays above rows */
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05); /* Light blue hover effect */
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+  }
+}
+
+/* Add some spacing and alignment */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.02); /* Light striped effect */
+}
+
+/* Ensure the table fits within the card */
+.app-card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+
+/* Highlight the "Add Listing" button */
+.dropdown-item.add-listing {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  font-weight: bold; /* Bold text */
+}
+
+/* Dropdown styling */
+.btn-group {
+  .dropdown-toggle {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+  }
+
+  .dropdown-menu {
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+    .dropdown-item {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+
+      &:hover {
+        background-color: #f8f9fa; /* Light gray hover effect */
+      }
+    }
+  }
+}
+
+
+/* Card styling */
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    text-align: right;
+  }
+}
+
+/* Collapse button styling */
+.btn-link {
+  color: #007bff;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

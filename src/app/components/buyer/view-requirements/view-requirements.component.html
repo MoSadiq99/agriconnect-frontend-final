@@ -1,0 +1,292 @@
+<div class="container-fluid">
+  <div class="row">
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-secondary text-white rounded-3 h-100" (click)="setFilter('All')"
+          (keypress)="setFilter('All')">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h3 class="card-title">Total</h3>
+            <p class="card-text fs-4">{{ buyerRequests.length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-primary text-white rounded-3 h-100" (click)="setFilter('Active')"
+          (keypress)="setFilter('Active')">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h3 class="card-title">Active</h3>
+            <p class="card-text fs-4">{{ getActiveBuyerRequests().length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-success text-white rounded-3 h-100" (click)="setFilter('Fulfilled')"
+          (keypress)="setFilter('Fulfilled')">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h3 class="card-title">Fulfilled</h3>
+            <p class="card-text fs-4">{{ getFulfilledBuyerRequests().length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-danger text-white rounded-3 h-100" (click)="setFilter('Expired')"
+          (keypress)="setFilter('Expired')">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h3 class="card-title">Expired</h3>
+            <p class="card-text fs-4">{{ getExpiredBuyerRequests().length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Horizontal Filter Menu -->
+    <div class="row mb-2">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex flex-wrap gap-3">
+            <!-- Crop Type Filter -->
+            <div>
+              <label for="cropTypeFilter" class="form-label">Crop Type</label>
+              <select id="cropTypeFilter" class="form-select" [(ngModel)]="selectedCropType"
+                (change)="filterBuyerRequests()">
+                <option value="All">All</option>
+                <option *ngFor="let type of cropTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <!-- Quantity Filter -->
+            <div>
+              <label for="quantityFilter" class="form-label">Quantity</label>
+              <input type="number" class="form-control" id="quantityFilter" [(ngModel)]="selectedQuantity"
+                (change)="filterBuyerRequests()" />
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+              <label for="statusFilter" class="form-label">Status</label>
+              <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatus"
+                (change)="filterBuyerRequests()">
+                <option value="All">All</option>
+                <option value="Active">Active</option>
+                <option value="Pending">Pending</option>
+                <option value="Fulfilled">Fulfilled</option>
+                <option value="Expired">Expired</option>
+              </select>
+            </div>
+
+            <!-- Request Type Filter -->
+            <div>
+              <label for="requestTypeFilter" class="form-label">Request Type</label>
+              <select id="requestTypeFilter" class="form-select" [(ngModel)]="selectedRequestType"
+                (change)="filterBuyerRequests()">
+                <option value="All">All</option>
+                <option *ngFor="let type of requestTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <!-- Reset Filters -->
+            <div class="align-self-end">
+              <button class="btn btn-outline-secondary" (click)="resetFilters()">Reset Filters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-12">
+      <!-- Post New Requirement Button -->
+      <div class="mb-4">
+        <button class="btn btn-outline-dark" (click)="openCreateBuyerRequestModal(createBuyerRequestModal)">
+          <i class="bi bi-plus-circle"></i> Post New Requirement
+        </button>
+      </div>
+
+      <div class="row">
+        <div *ngFor="let request of filteredBuyerRequests" class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+          <div>
+            <h5 class="card-title mb-0">{{ request.cropType }}</h5>
+            <span class="badge" [ngClass]="{
+            'bg-success': request.status === 'Active',
+            'bg-warning': request.status === 'Pending',
+            'bg-danger': request.status === 'Expired',
+            'bg-secondary': request.status === 'Fulfilled'
+          }">
+          {{ request.status }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p><strong>Quantity:</strong> <span class="ms-2">{{ request.quantity }} {{ request.quantityType }}</span></p>
+          <p><strong>Start Date:</strong> <span class="ms-2">{{ request.startDate | date: 'mediumDate' }}</span></p>
+          <p><strong>Deadline:</strong> <span class="ms-2">{{ request.deadline | date: 'mediumDate' }}</span></p>
+          <p><strong>Request Type:</strong> <span class="ms-2">{{ request.requestType }}</span></p>
+          <p><strong>Description:</strong> <span class="ms-2">{{ request.description }}</span></p>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center bg-light">
+          <div>
+            <button *ngIf="request.status === 'Pending'" class="btn btn-sm btn-primary me-2 rounded-2"
+          (click)="publishRequirement(request)">
+          <i class="bi bi-upload"></i> Publish
+            </button>
+            <button *ngIf="request.status === 'Active'" class="btn btn-sm btn-warning me-2 rounded-2"
+          (click)="unpublishRequirement(request)">
+          <i class="bi bi-download"></i> Unpublish
+            </button>
+          </div>
+          <div class="dropdown d-inline-block">
+            <button class="btn btn-sm btn-secondary dropdown-toggle rounded-2" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          <i class="bi bi-gear"></i>
+            </button>
+            <ul class="dropdown-menu">
+          <!-- <li>
+            <button class="dropdown-item" (click)="updateRequirement(request)">
+              <i class="bi bi-pencil me-2"></i> Update
+            </button>
+          </li> -->
+          <li>
+            <button class="dropdown-item" (click)="openUpdateBuyerRequestModal(updateBuyerRequestModal, request)">
+              <i class="bi bi-pencil me-2"></i> Update
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item text-danger" (click)="deleteRequirement(request)">
+              <i class="bi bi-trash me-2"></i> Delete
+            </button>
+          </li>
+            </ul>
+          </div>
+        </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Create Buyer Request Modal -->
+<ng-template #createBuyerRequestModal let-modal>
+  <div class="modal-header text-center w-100">
+    <h4 class="modal-title w-100">Post New Requirement</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form #buyerRequestForm="ngForm" (ngSubmit)="createBuyerRequest()" class="row g-3">
+      <div class="col-md-6">
+        <label for="cropType" class="form-label">Crop Type</label>
+        <input type="text" class="form-control" id="cropType" [(ngModel)]="newBuyerRequest.cropType" name="cropType" required #cropType="ngModel">
+        <div *ngIf="cropType.invalid && cropType.touched" class="text-danger">Crop Type is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="quantity" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="quantity" [(ngModel)]="newBuyerRequest.quantity" name="quantity" required min="1" #quantity="ngModel">
+        <div *ngIf="quantity.invalid && quantity.touched" class="text-danger">Enter a valid quantity.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Quantity Type</label>
+        <div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="quantityTypeCount" value="Count" [(ngModel)]="newBuyerRequest.quantityType" name="quantityType" required>
+            <label class="form-check-label" for="quantityTypeCount">Pcs</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="quantityTypeKg" value="Kg" [(ngModel)]="newBuyerRequest.quantityType" name="quantityType" required>
+            <label class="form-check-label" for="quantityTypeKg">Kg</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="startDate" [(ngModel)]="newBuyerRequest.startDate" name="startDate" required #startDate="ngModel">
+        <div *ngIf="startDate.invalid && startDate.touched" class="text-danger">Select a valid start date.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="deadline" class="form-label">Deadline</label>
+        <input type="date" class="form-control" id="deadline" [(ngModel)]="newBuyerRequest.deadline" name="deadline" required #deadline="ngModel">
+        <div *ngIf="deadline.invalid && deadline.touched" class="text-danger">Select a valid deadline.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="requestType" class="form-label">Request Type</label>
+        <select class="form-select" id="requestType" [(ngModel)]="newBuyerRequest.requestType" name="requestType" required #requestType="ngModel">
+          <option *ngFor="let type of requestTypes" [value]="type">{{ type }}</option>
+        </select>
+        <div *ngIf="requestType.invalid && requestType.touched" class="text-danger">Select a request type.</div>
+      </div>
+      <div class="col-12">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" [(ngModel)]="newBuyerRequest.description" name="description" required #description="ngModel"></textarea>
+        <div *ngIf="description.invalid && description.touched" class="text-danger">Description is required.</div>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary w-50" [disabled]="buyerRequestForm.invalid">Post Requirement</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<!-- Update Buyer Request Modal -->
+<ng-template #updateBuyerRequestModal let-modal>
+  <div class="modal-header text-center w-100">
+    <h4 class="modal-title w-100">Update Requirement</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form #updateBuyerRequestForm="ngForm" (ngSubmit)="updateBuyerRequest()" class="row g-3">
+      <div class="col-md-6">
+        <label for="cropTypeUpdate" class="form-label">Crop Type</label>
+        <input type="text" class="form-control" id="cropTypeUpdate" [(ngModel)]="selectedRequest.cropType" name="cropTypeUpdate" required #cropTypeUpdate="ngModel">
+        <div *ngIf="cropTypeUpdate.invalid && cropTypeUpdate.touched" class="text-danger">Crop Type is required.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="quantityUpdate" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="quantityUpdate" [(ngModel)]="selectedRequest.quantity" name="quantityUpdate" required min="1" #quantityUpdate="ngModel">
+        <div *ngIf="quantityUpdate.invalid && quantityUpdate.touched" class="text-danger">Enter a valid quantity.</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Quantity Type</label>
+        <div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="quantityTypeCountUpdate" value="Count" [(ngModel)]="selectedRequest.quantityType" name="quantityTypeUpdate" required>
+            <label class="form-check-label" for="quantityTypeCountUpdate">Pcs</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="quantityTypeKgUpdate" value="Kg" [(ngModel)]="selectedRequest.quantityType" name="quantityTypeUpdate" required>
+            <label class="form-check-label" for="quantityTypeKgUpdate">Kg</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="startDateUpdate" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="startDateUpdate" [(ngModel)]="selectedRequest.startDate" name="startDateUpdate" required #startDateUpdate="ngModel">
+        <div *ngIf="startDateUpdate.invalid && startDateUpdate.touched" class="text-danger">Select a valid start date.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="deadlineUpdate" class="form-label">Deadline</label>
+        <input type="date" class="form-control" id="deadlineUpdate" [(ngModel)]="selectedRequest.deadline" name="deadlineUpdate" required #deadlineUpdate="ngModel">
+        <div *ngIf="deadlineUpdate.invalid && deadlineUpdate.touched" class="text-danger">Select a valid deadline.</div>
+      </div>
+      <div class="col-md-6">
+        <label for="requestTypeUpdate" class="form-label">Request Type</label>
+        <select class="form-select" id="requestTypeUpdate" [(ngModel)]="selectedRequest.requestType" name="requestTypeUpdate" required #requestTypeUpdate="ngModel">
+          <option *ngFor="let type of requestTypes" [value]="type">{{ type }}</option>
+        </select>
+        <div *ngIf="requestTypeUpdate.invalid && requestTypeUpdate.touched" class="text-danger">Select a request type.</div>
+      </div>
+      <div class="col-12">
+        <label for="descriptionUpdate" class="form-label">Description</label>
+        <textarea class="form-control" id="descriptionUpdate" [(ngModel)]="selectedRequest.description" name="descriptionUpdate" required #descriptionUpdate="ngModel"></textarea>
+        <div *ngIf="descriptionUpdate.invalid && descriptionUpdate.touched" class="text-danger">Description is required.</div>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary w-50" [disabled]="updateBuyerRequestForm.invalid">Update Requirement</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
