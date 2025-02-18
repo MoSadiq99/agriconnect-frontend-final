@@ -1,9 +1,12 @@
+import { Cultivation } from './../../../models/cultivation';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Listing } from '../../../models/listing';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListingService } from 'src/app/services/listing.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { CultivationService } from 'src/app/services/cultivation.service';
 
 @Component({
   selector: 'app-view-listings',
@@ -14,6 +17,8 @@ import { ListingService } from 'src/app/services/listing.service';
   providers: [DatePipe]
 })
 export class ViewListingsComponent implements OnInit {
+
+  cultivations: Cultivation[] = [];
   listings: Listing[] = [];
   filteredListings: Listing[] = [];
   selectedListing: Listing | null = null;
@@ -22,8 +27,16 @@ export class ViewListingsComponent implements OnInit {
   sortBy: string = 'harvestDate';
   collapsedStates: Map<string, boolean> = new Map(); // Track collapsed state
 
-  constructor(private modalService: NgbModal, private datePipe: DatePipe, private listingService: ListingService) {}
+  constructor(
+    private readonly modalService: NgbModal,
+    private readonly listingService: ListingService,
+    private readonly authenticationService: AuthenticationService,
+    private readonly cultivationService: CultivationService
+  ) {}
 
+  async getFarmerCultivations(): Promise<void> {
+    this.cultivations = await this.cultivationService.getCultivations();
+  }
   getSampleListings(): Listing[] {
     return [
       new Listing({
@@ -35,8 +48,8 @@ export class ViewListingsComponent implements OnInit {
         harvestDate: new Date('2023-09-01'),
         location: 'Kurunegala, Sri Lanka',
         description: 'High-quality Beans from organic farming.',
-        status: 'Active',
-        farmerId: '123'
+        status: 'PENDING',
+        farmerId: 123
       }),
       new Listing({
         id: '2',
@@ -47,8 +60,8 @@ export class ViewListingsComponent implements OnInit {
         harvestDate: new Date('2023-11-15'),
         location: 'Kurunegala, Sri Lanka',
         description: 'Samba rice grown in fertile soil.',
-        status: 'Pending',
-        farmerId: '123'
+        status: 'ACTIVE',
+        farmerId: 123
       })
     ];
   }
@@ -90,23 +103,24 @@ export class ViewListingsComponent implements OnInit {
     });
   }
 
+  createListing(): void {
+    this.newListing.farmerId = this.authenticationService.getCurrentUserId();
+    this.listings.push(this.newListing);
+    this.filteredListings = [...this.listings];
+    this.modalService.dismissAll();
+  }
+
   getActiveListings(): Listing[] {
-    return this.listings.filter(listing => listing.status === 'Active');
+    return this.listings.filter(listing => listing.status === 'ACTIVE');
   }
 
   getPendingListings(): Listing[] {
-    return this.listings.filter(listing => listing.status === 'Pending');
+    return this.listings.filter(listing => listing.status === 'PENDING');
   }
 
   openCreateListingModal(content: unknown): void {
     this.newListing = new Listing();
     this.modalService.open(content, { size: 'lg' });
-  }
-
-  createListing(): void {
-    this.listings.push(this.newListing);
-    this.filteredListings = [...this.listings];
-    this.modalService.dismissAll();
   }
 
   openUpdateModal(content: unknown, listing: Listing): void {

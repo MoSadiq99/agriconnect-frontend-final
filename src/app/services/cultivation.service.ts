@@ -26,7 +26,7 @@ export class CultivationService {
   // Add a new cultivation
   async addCultivation(cultivation: Cultivation): Promise<Cultivation> {
     try {
-      const response = await axios.post(`${this.baseUrl}/farmer/cultivation`, cultivation);
+      const response = await axios.post(`${this.baseUrl}/farmer/cultivations`, cultivation);
       return response.data; // Return the newly added cultivation
     } catch (error) {
       this.handleError(error);
@@ -37,7 +37,7 @@ export class CultivationService {
   // Update an existing cultivation
   async updateCultivation(cultivation: Cultivation): Promise<Cultivation> {
     try {
-      const response = await axios.put(`${this.baseUrl}/farmer/cultivation/${cultivation.id}`, cultivation);
+      const response = await axios.put(`${this.baseUrl}/farmer/cultivations/${cultivation.id}`, cultivation);
       return response.data; // Return the updated cultivation
     } catch (error) {
       this.handleError(error);
@@ -48,7 +48,7 @@ export class CultivationService {
   // Delete a cultivation by ID
   async deleteCultivation(cultivationId: number): Promise<void> {
     try {
-      await axios.delete(`${this.baseUrl}/farmer/cultivation/${cultivationId}`);
+      await axios.delete(`${this.baseUrl}/farmer/cultivations/${cultivationId}`);
     } catch (error) {
       this.handleError(error);
       throw error; // Re-throw the error for the component to handle

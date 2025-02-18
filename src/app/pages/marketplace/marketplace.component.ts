@@ -50,8 +50,9 @@ export class MarketplaceComponent implements OnInit {
         harvestDate: new Date('2023-10-15'),
         location: 'Farm A, Village X',
         description: 'High-quality organic rice.',
-        status: 'Active',
-        farmerId: ''
+        status: 'ACTIVE',
+        farmerId: 123,
+        cultivationId: 1
       },
       {
         id: '2',
@@ -62,8 +63,9 @@ export class MarketplaceComponent implements OnInit {
         harvestDate: new Date('2023-11-01'),
         location: 'Farm B, Village Y',
         description: 'Freshly harvested tea leaves.',
-        status: 'Pending',
-        farmerId: ''
+        status: 'PENDING',
+        farmerId: 123,
+        cultivationId: 1
       },
       {
         id: '3',
@@ -74,8 +76,9 @@ export class MarketplaceComponent implements OnInit {
         harvestDate: new Date('2023-09-20'),
         location: 'Farm C, Village Z',
         description: 'Organic green beans.',
-        status: 'Expired',
-        farmerId: ''
+        status: 'EXPIRED',
+        farmerId: 123,
+        cultivationId: 1
       }
     ];
 

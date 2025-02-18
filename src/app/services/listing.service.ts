@@ -16,7 +16,6 @@ export class ListingService {
       return await axios.get(`${this.baseUrl}/farmer/listings`)
     }
 
-
     async addListings(listing: Listing) {
       return await axios.post(`${this.baseUrl}/farmer/listings`, listing);
     }

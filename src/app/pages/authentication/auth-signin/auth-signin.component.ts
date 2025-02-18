@@ -32,11 +32,16 @@ export class AuthSigninComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
+      console.log('Sending payload:', { email, password }); // Log the payload
       this.authService.login({ email, password }).subscribe({
         next: (response) => {
           // Assuming the response contains the user's role
-          const role = response.roles[0]; // Assuming roles is an array and we take the first role
-          this.redirectBasedOnRole(role);
+          // const role = response.roles[0]; // Assuming roles is an array and we take the first role
+          // this.redirectBasedOnRole(role);
+
+          const roles: string [] = response.roles;
+          this.redirectBasedOnRole(roles);
+
         },
         error: (err) => {
           console.error('Login failed', err);
@@ -45,19 +50,31 @@ export class AuthSigninComponent {
     }
   }
 
-  redirectBasedOnRole(role: string) {
-    switch (role) {
-      case 'ROLE_ADMIN':
-        this.router.navigate(['/admin/dashboard']);
-        break;
-      case 'ROLE_FARMER':
-        this.router.navigate(['/farmer/dashboard']);
-        break;
-      case 'ROLE_BUYER':
-        this.router.navigate(['/buyer/dashboard']);
-        break;
-      default:
-        this.router.navigate(['/']);
+  redirectBasedOnRole(roles: string []) {
+    if (roles.includes('ROLE_ADMIN')) {
+      this.router.navigate(['/admin/dashboard']);
+    } else if (roles.includes('ROLE_FARMER')) {
+      this.router.navigate(['/farmer/dashboard']);
+    } else if (roles.includes('ROLE_BUYER')) {
+      this.router.navigate(['/buyer/dashboard']);
+    } else {
+      this.router.navigate(['/auth/signin']);
     }
   }
+
+  // redirectBasedOnRole(role: string) {
+  //   switch (role) {
+  //     case 'ROLE_ADMIN':
+  //       this.router.navigate(['/admin/dashboard']);
+  //       break;
+  //     case 'ROLE_FARMER':
+  //       this.router.navigate(['/farmer/dashboard']);
+  //       break;
+  //     case 'ROLE_BUYER':
+  //       this.router.navigate(['/buyer/dashboard']);
+  //       break;
+  //     default:
+  //       this.router.navigate(['/']);
+  //   }
+  // }
 }

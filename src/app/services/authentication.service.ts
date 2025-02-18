@@ -1,121 +1,61 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
+import { Observable, tap } from 'rxjs';
 import { BaseService } from './base-service';
 import { ApiConfiguration } from './api-configuration';
 import { LoginResponse } from '../models/login-response';
 import { UserRegisterDto } from './models';
 
-
-
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService extends BaseService {
+
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
   }
 
-  /** Path part for operation `register()` */
-  static readonly RegisterPath = '/api/auth/register';
+  static readonly RegisterPath = 'http://localhost:8080/api/auth/register';
 
   register(user: UserRegisterDto): Observable<unknown> {
     return this.http.post(AuthenticationService.RegisterPath, user);
   }
 
-  /** Path part for operation `login()` */
-  static readonly LoginPath = '/api/auth/login';
+  static readonly LoginPath = 'http://localhost:8080/api/auth/login';
 
   login(credentials: { email: string, password: string }): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(AuthenticationService.LoginPath, credentials);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<LoginResponse>(AuthenticationService.LoginPath, credentials, { headers }).pipe(
+      tap((response) => this.handleLoginResponse(response))
+    );
+  }
+
+  private handleLoginResponse(response: LoginResponse): void {
+    console.log('Login response:', response); //! Debugging line
+
+    // Set the user roles after a successful login
+    this.setCurrentUserRoles(response.roles);
+    // Set the user ID after a successful login
+    this.setCurrentUserId(response.userId);
+  }
+
+  private currentUserRoles: string[] = [];
+
+  getCurrentUserRoles(): string[] {
+    return this.currentUserRoles;
+  }
+
+  setCurrentUserRoles(roles: string[]): void {
+    this.currentUserRoles = roles;
+  }
+
+  private currentUserId: number;
+
+  setCurrentUserId(userId: number): void {
+    console.log('Setting current user ID:', userId);
+    this.currentUserId = userId;
+  }
+
+  getCurrentUserId(): number {
+    return this.currentUserId;
   }
 }
 
-/**
- * Authentication endpoints
- */
-// @Injectable({ providedIn: 'root' })
-// export class AuthenticationService extends BaseService {
-//   constructor(config: ApiConfiguration, http: HttpClient) {
-//     super(config, http);
-//   }
-
-//   /** Path part for operation `register()` */
-//   static readonly RegisterPath = '/api/auth/register';
-
-//   /**
-//    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-//    * To access only the response body, use `register()` instead.
-//    *
-//    * This method sends `application/json` and handles request body of type `application/json`.
-//    */
-//   register$Response(params: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<{
-// }>> {
-//     return register(this.http, this.rootUrl, params, context);
-//   }
-
-//   /**
-//    * This method provides access only to the response body.
-//    * To access the full response (for headers, for example), `register$Response()` instead.
-//    *
-//    * This method sends `application/json` and handles request body of type `application/json`.
-//    */
-//   register(params: Register$Params, context?: HttpContext): Observable<{
-// }> {
-//     return this.register$Response(params, context).pipe(
-//       map((r: StrictHttpResponse<{
-// }>): {
-// } => r.body)
-//     );
-//   }
-
-//   /** Path part for operation `logout()` */
-//   static readonly LogoutPath = '/api/auth/logout';
-
-//   /**
-//    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-//    * To access only the response body, use `logout()` instead.
-//    *
-//    * This method doesn't expect any request body.
-//    */
-//   logout$Response(params?: Logout$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
-//     return logout(this.http, this.rootUrl, params, context);
-//   }
-
-//   /**
-//    * This method provides access only to the response body.
-//    * To access the full response (for headers, for example), `logout$Response()` instead.
-//    *
-//    * This method doesn't expect any request body.
-//    */
-//   logout(params?: Logout$Params, context?: HttpContext): Observable<string> {
-//     return this.logout$Response(params, context).pipe(
-//       map((r: StrictHttpResponse<string>): string => r.body)
-//     );
-//   }
-
-//   /** Path part for operation `login()` */
-//   static readonly LoginPath = '/api/auth/login';
-
-//   /**
-//    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-//    * To access only the response body, use `login()` instead.
-//    *
-//    * This method sends `application/json` and handles request body of type `application/json`.
-//    */
-//   login$Response(params: Login$Params, context?: HttpContext): Observable<StrictHttpResponse<LoginResponse>> {
-//     return login(this.http, this.rootUrl, params, context);
-//   }
-
-//   /**
-//    * This method provides access only to the response body.
-//    * To access the full response (for headers, for example), `login$Response()` instead.
-//    *
-//    * This method sends `application/json` and handles request body of type `application/json`.
-//    */
-//   login(params: Login$Params, context?: HttpContext): Observable<LoginResponse> {
-//     return this.login$Response(params, context).pipe(
-//       map((r: StrictHttpResponse<LoginResponse>): LoginResponse => r.body)
-//     );
-//   }
-
-// }

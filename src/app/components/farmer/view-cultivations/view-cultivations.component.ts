@@ -4,6 +4,7 @@ import { CultivationService } from 'src/app/services/cultivation.service';
 import { Cultivation } from '../../../models/cultivation';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-view-cultivations',
@@ -25,6 +26,7 @@ export class ViewCultivationsComponent implements OnInit {
   filteredCropTypes: string[] = [];
 
   constructor(
+    private readonly authenticationService: AuthenticationService,
     private readonly cultivationService: CultivationService,
     private readonly modalService: NgbModal,
     // private datePipe: DatePipe
@@ -130,8 +132,21 @@ export class ViewCultivationsComponent implements OnInit {
   // Create a new cultivation
   createCultivation(): void {
     if (this.newCultivation.cultivationDate && this.newCultivation.harvestDate && this.newCultivation.expectedYield && this.newCultivation.landSize) {
+      this.newCultivation.farmerId = this.authenticationService.getCurrentUserId();
+        console.log("Farmer ID: ", this.newCultivation.farmerId);
+      if (this.newCultivation.methodOfCultivation === 'Conventional') {
+        this.newCultivation.methodOfCultivation = 'CONVENTIONAL';
+      }
+      if (this.newCultivation.methodOfCultivation === 'Organic') {
+        this.newCultivation.methodOfCultivation = 'ORGANIC';
+      }
       this.cultivations.push(this.newCultivation);
       this.filteredCultivations = [...this.cultivations];
+      this.cultivationService.addCultivation(this.newCultivation).then((response) => {
+        console.log('Cultivation added successfully:', response);
+        this.newCultivation = new Cultivation();
+        this.filteredCropTypes = this.cropTypes;
+      })
       this.modalService.dismissAll();
     } else {
       console.log('Please fill all required fields');

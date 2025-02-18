@@ -39,7 +39,12 @@ export class AuthSignupComponent {
     console.log('Form Value:', this.signupForm.value);
     if (this.signupForm.valid) {
       const formValue = this.signupForm.value;
-      formValue.roles = [formValue.userType]; // Assuming userType maps directly to roles
+      // formValue.roles = [formValue.userType]; // Assuming userType maps directly to roles
+      if (formValue.userType === 'FARMER') {
+        formValue.roles = ['ROLE_FARMER'];
+      } else if (formValue.userType === 'BUYER') {
+        formValue.roles = ['ROLE_BUYER'];
+      }
       this.authService.register(formValue).subscribe({
         next: (response) => {
           console.log('Registration successful:', response);

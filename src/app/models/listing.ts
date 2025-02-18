@@ -7,8 +7,9 @@ export class Listing {
   harvestDate: Date | null;
   location: string;
   description: string;
-  status: 'Pending' | 'Active' | 'Sold' | 'Expired';
-  farmerId: string;
+  status: 'PENDING' | 'ACTIVE' | 'SOLD' | 'EXPIRED';
+  farmerId: number;
+  cultivationId: number;
 
   constructor(init?: Partial<Listing>) {
     this.id = null;
@@ -19,7 +20,7 @@ export class Listing {
     this.harvestDate = null;
     this.location = '';
     this.description = '';
-    this.status = 'Pending';
+    this.status = 'PENDING';
 
     Object.assign(this, init);
   }

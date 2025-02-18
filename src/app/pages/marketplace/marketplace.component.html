@@ -72,10 +72,10 @@
               <div>
                 <h5 class="card-title">{{ listing.cropType }}</h5>
                 <span class="badge" [ngClass]="{
-                  'bg-success': listing.status === 'Active',
-                  'bg-warning': listing.status === 'Pending',
-                  'bg-danger': listing.status === 'Expired',
-                  'bg-secondary': listing.status === 'Sold'
+                  'bg-success': listing.status === 'ACTIVE',
+                  'bg-warning': listing.status === 'PENDING',
+                  'bg-danger': listing.status === 'EXPIRED',
+                  'bg-secondary': listing.status === 'SOLD'
                 }">
                   {{ listing.status }}
                 </span>
